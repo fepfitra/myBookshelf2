@@ -1,6 +1,7 @@
 class AppBar extends HTMLElement {
   connectedCallback(){
     this.render();
+    alert("app-bar.js")
   }
 
   render(){
