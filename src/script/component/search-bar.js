@@ -3,6 +3,15 @@ class SearchBar extends HTMLElement {
     this.render();
   }
 
+  set inputEvent(event){
+    this._clickEvent = event;
+    this.render();
+  }
+
+  get value(){
+    return this.querySelector('#find').value;
+  }
+
   render(){
     this.innerHTML = `
       <style>
@@ -12,6 +21,8 @@ class SearchBar extends HTMLElement {
         <input type="text" id="find" class="form-control" placeholder="Find a book">
       </div>
     `;
+
+    this.querySelector('#find').addEventListener('input', this._clickEvent);
   }
 }
 
