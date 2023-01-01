@@ -6,7 +6,7 @@ const STORAGE_KEY = 'BOOKSHELF_APPS';
 
 const main = () => {
   function isStorageExist() {
-    alert("main.js");
+    // alert("main.js");
       if (typeof(Storage) === undefined) {
           alert("Browser kamu tidak mendukung local storage");
           return false;
