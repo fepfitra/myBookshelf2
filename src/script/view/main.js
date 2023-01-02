@@ -7,8 +7,7 @@ const SAVED_EVENT = 'saved-book';
 const STORAGE_KEY = 'BOOKSHELF_APPS';
 
 const main = () => {
-  function isStorageExist() {
-    // alert("main.js");
+  const isStorageExist = () => {
     if (typeof(Storage) === undefined) {
       alert("Browser kamu tidak mendukung local storage");
       return false;
@@ -16,7 +15,7 @@ const main = () => {
     return true;
   }
 
-  function loadDataFromStorage(){
+  const loadDataFromStorage = () => {
     const serializedData = localStorage.getItem(STORAGE_KEY);
     let data = JSON.parse(serializedData);
 
@@ -29,7 +28,7 @@ const main = () => {
     document.dispatchEvent(new Event(RENDER_EVENT));
   }
 
-  function refresh(){
+  const refresh = () => {
     editingId = null;
     document.getElementById('title').value = '';
     document.getElementById('author').value ='';
@@ -42,17 +41,18 @@ const main = () => {
     document.getElementById('editIsCompleted').checked = false;
   }
 
-  function makeBook(bookObject){
+  const makeBook = (bookObject) => {
     const isCompleted = document.createElement('input');
     isCompleted.checked = bookObject.isCompleted;
     isCompleted.type = 'checkbox';
     isCompleted.classList.add('form-check-input', 'me-1', 'mt-3');
-    isCompleted.addEventListener('change', function(){
-      if(this.checked){
-        toCompleted(bookObject.id);
-      }else{
-        toUncompleted(bookObject.id);
-      }
+    isCompleted.addEventListener('change', () => {
+
+      const bookTarget = findBook(bookObject.id);
+      if(bookTarget == null) return;
+      bookTarget.isCompleted = isCompleted.checked;
+      document.dispatchEvent(new Event(RENDER_EVENT));
+      saveData();
     });
 
 
@@ -80,7 +80,7 @@ const main = () => {
 
     const editButton = document.createElement('button');
     editButton.classList.add('btn', 'btn-outline-primary');
-    editButton.addEventListener('click', function(){
+    editButton.addEventListener('click', () => {
       editBook(bookObject.id);
     })
 
@@ -96,7 +96,7 @@ const main = () => {
 
     const deleteButton = document.createElement('button');
     deleteButton.classList.add('btn', 'btn-outline-primary');
-    deleteButton.addEventListener('click', function(){
+    deleteButton.addEventListener('click', () => {
       deleteBook(bookObject.id);
     });
 
@@ -120,23 +120,23 @@ const main = () => {
     return liContainer;
   }
 
-  document.addEventListener('DOMContentLoaded', function(){
+  document.addEventListener('DOMContentLoaded', () => {
     const submitButton = document.getElementById('submit');
-    submitButton.addEventListener('click', function(event){
+    submitButton.addEventListener('click', (event) => {
       addBook();
       refresh();
       event.preventDefault();
     });
 
     const editSubmitButton = document.getElementById('editSubmit');
-    editSubmitButton.addEventListener('click', function(event){
+    editSubmitButton.addEventListener('click', (event) => {
       editSubmit(editingId);
       refresh();
       event.preventDefault();
     });
 
     const cancelButton = document.getElementById('cancel');
-    cancelButton.addEventListener('click', function(){
+    cancelButton.addEventListener('click', () => {
       editCancel();
       refresh();
     });
@@ -152,17 +152,17 @@ const main = () => {
     }
   });
 
-  document.addEventListener('DOMContentLoaded', function(){
+  document.addEventListener('DOMContentLoaded', () => {
     if(isStorageExist()){
       loadDataFromStorage();
     }
   });
 
-  document.addEventListener(RENDER_EVENT, function(){
+  document.addEventListener(RENDER_EVENT, () => {
     renderAction('');
   });
 
-  function renderAction(value){
+  const renderAction = (value) => {
     const regex = new RegExp(value,"i");
 
     const uncompletedBookList = document.getElementById('uncompleted-list');
@@ -192,11 +192,11 @@ const main = () => {
     }
   }
 
-  function generateId(){
+  const generateId = () => {
     return +new Date();
   }
 
-  function generateBookObject(id, title, author, year, isCompleted){
+  const generateBookObject = (id, title, author, year, isCompleted) => {
     return {
       id,
       title,
@@ -206,7 +206,7 @@ const main = () => {
     }
   }
 
-  function saveData(){
+  const saveData = () => {
     if(isStorageExist()){
         const parsed = JSON.stringify(books);
         localStorage.setItem(STORAGE_KEY, parsed);
@@ -214,7 +214,7 @@ const main = () => {
     }
   }
 
-  function addBook(){
+  const addBook = () => {
     const generateID = generateId();
     const title = document.getElementById('title').value;
     const author = document.getElementById('author').value;
@@ -228,7 +228,7 @@ const main = () => {
     saveData();
   }
 
-  function findBookIndex(bookId){
+  const findBookIndex = (bookId) => {
     for(const index in books){
       if(books[index].id === bookId){
         return index;
@@ -238,7 +238,7 @@ const main = () => {
     return -1;
   }
 
-  function deleteBook(bookId){
+  const deleteBook = (bookId) => {
     const bookTarget = findBookIndex(bookId);
 
     if(bookTarget == -1) return;
@@ -248,7 +248,7 @@ const main = () => {
     saveData();
   }
 
-  function findBook(bookId){
+  const findBook = (bookId) => {
     for(const bookItem of books){
       if(bookItem.id == bookId){
         return bookItem;
@@ -258,27 +258,7 @@ const main = () => {
     return null;
   }
 
-  function toCompleted(bookId){
-    const bookTarget = findBook(bookId);
-
-    if(bookTarget == null) return;
-
-    bookTarget.isCompleted = true;
-    document.dispatchEvent(new Event(RENDER_EVENT));
-    saveData();
-  }
-
-  function toUncompleted(bookId){
-    const bookTarget = findBook(bookId);
-
-    if(bookTarget == null) return;
-
-    bookTarget.isCompleted = false;
-    document.dispatchEvent(new Event(RENDER_EVENT));
-    saveData();
-  }
-
-  function editBook(bookId){
+  const editBook = (bookId) => {
     const bookTarget = findBook(bookId); 
     if(bookTarget == null) return;
 
@@ -294,7 +274,7 @@ const main = () => {
       
   }
 
-  function editSubmit(bookId){
+  const editSubmit = (bookId) => {
     const bookTarget = findBook(bookId); 
     if(bookTarget == null) return;
 
@@ -310,7 +290,7 @@ const main = () => {
     saveData();
   }
 
-  function editCancel(){
+  const editCancel = () => {
     document.getElementById('add-form').classList.remove('hide');
     document.getElementById('edit-form').classList.add('hide');
   }

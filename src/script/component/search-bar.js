@@ -19,7 +19,7 @@ class SearchBar extends HTMLElement {
   render(){
     this.shadowDOM.innerHTML = `
       <style>
-        @import url 'https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css';
+        @import url('https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css');
         * {
           margin: 0;
           padding: 0;
