@@ -31,7 +31,7 @@ class SearchBar extends HTMLElement {
       </div>
     `;
 
-    this.shadowDOM.querySelector('#find').addEventListener('');
+    this.shadowDOM.querySelector('#find').addEventListener('input',this._clickEvent);
   }
 }
 
