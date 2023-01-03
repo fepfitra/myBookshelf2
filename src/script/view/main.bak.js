@@ -5,7 +5,7 @@ let editingId = null;
 const RENDER_EVENT = 'render-book';
 const SAVED_EVENT = 'saved-book';
 const STORAGE_KEY = 'BOOKSHELF_APPS';
-const baseurl = 'localhost';
+const baseurl = 'http://localhost';
 
 const main = () => {
 
@@ -190,32 +190,14 @@ const main = () => {
   document.addEventListener('DOMContentLoaded', () => {
     const submitButton = document.getElementById('submit');
     submitButton.addEventListener('click', (event) => {
-      // addBook();
-      const generateID = generateId();
-      const title = document.getElementById('title').value;
-      const author = document.getElementById('author').value;
-      const year = document.getElementById('year').value;
-      const isCompleted = document.getElementById('isCompleted').checked;
-      const bookObject = generateBookObject(generateID, title, author, year, isCompleted);
-
-      console.log(bookObject);
-      insertBook(bookObject);
+      addBook();
       refresh();
       event.preventDefault();
     });
 
     const editSubmitButton = document.getElementById('editSubmit');
     editSubmitButton.addEventListener('click', (event) => {
-      // editSubmit(editingId);
-
-      bookTarget.title = document.getElementById('editTitle').value;
-      bookTarget.author = document.getElementById('editAuthor').value;
-      bookTarget.year = document.getElementById('editYear').value;
-      bookTarget.isCompleted = document.getElementById('editIsCompleted').checked;
-      
-      document.getElementById('add-form').classList.remove('hide');
-      document.getElementById('edit-form').classList.add('hide');
-
+      editSubmit(editingId);
       refresh();
       event.preventDefault();
     });
