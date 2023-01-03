@@ -5,7 +5,7 @@ let editingId = null;
 const RENDER_EVENT = 'render-book';
 const SAVED_EVENT = 'saved-book';
 const STORAGE_KEY = 'BOOKSHELF_APPS';
-const baseurl = 'localhost';
+const baseurl = 'http://localhost:5000';
 
 const main = () => {
 
@@ -14,16 +14,16 @@ const main = () => {
 
     xhr.onload = function () {
       const responseJson = JSON.parse(this.responseText);
-
+      
       if(responseJson.error){
-        console.log(responseJson.message);
+        alert(responseJson.message);
       } else {
         renderAction('');
       }
     }
 
-    xhr.onerror = () => {console.log('connection error')};
-    xhr.open('GET', `${baseurl}/list`);
+    xhr.onerror = function () { console.log('connection error') };
+    xhr.open('GET', `${baseurl}/books`);
     xhr.send();
   }
 
@@ -32,11 +32,12 @@ const main = () => {
 
     xhr.onload = function () {
       const responseJson = JSON.parse(this.responseText);
-      console.log(responseJson.message);
+      alert(responseJson);
       getBook();
     }
-    xhr.onerror = () => {console.log('connection error')};
-    xhr.open('POST', `${baseurl}/add`);
+    // xhr.onerror = () => {console.log('connection error')};
+    xhr.onerror = () => {alert('error')};
+    xhr.open('POST', `${baseurl}/books`);
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.setRequestHeader('X-Auth-Token', '12345');
     xhr.send(JSON.stringify(book));
@@ -47,11 +48,11 @@ const main = () => {
 
     xhr.onload = function () {
       const responseJson = JSON.parse(this.responseText);
-      console.log(responseJson.message);
+      // console.log(responseJson.message);
       getBook();
     }
 
-    xhr.onerror = () => {console.log('connection error')};
+    // xhr.onerror = () => {console.log('connection error')};
     xhr.open('PUT', `${baseurl}/edit/${book.id}`);
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.setRequestHeader('X-Auth-Token', '12345');
@@ -62,11 +63,11 @@ const main = () => {
     const xhr = new XMLHttpRequest();
     xhr.onload = function () {
       const responseJson = JSON.parse(this.responseText);
-      console.log(responseJson.message);
+      // console.log(responseJson.message);
       getBook();
     }
 
-    xhr.onerror = () => {console.log('connection error')};
+    // xhr.onerror = () => {console.log('connection error')};
     xhr.open('DELETE', `${baseurl}/delete/${bookId}`);
     xhr.setRequestHeader('X-Auth-Token', '12345');
     xhr.send();
@@ -198,7 +199,6 @@ const main = () => {
       const isCompleted = document.getElementById('isCompleted').checked;
       const bookObject = generateBookObject(generateID, title, author, year, isCompleted);
 
-      console.log(bookObject);
       insertBook(bookObject);
       refresh();
       event.preventDefault();
