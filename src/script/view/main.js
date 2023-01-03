@@ -16,13 +16,14 @@ const main = () => {
       const responseJson = JSON.parse(this.responseText);
       
       if(responseJson.error){
-        alert(responseJson.message);
+        alert('gagal');
       } else {
-        renderAction('');
+        alert(JSON.stringify(responseJson.books));
+        // renderAction();
       }
     }
 
-    xhr.onerror = function () { console.log('connection error') };
+    xhr.onerror = function () { alert('connection error')};
     xhr.open('GET', `${baseurl}/books`);
     xhr.send();
   }
@@ -32,14 +33,14 @@ const main = () => {
 
     xhr.onload = function () {
       const responseJson = JSON.parse(this.responseText);
-      alert(responseJson);
+      // alert(responseJson);
+      // alert('berhasil');
       getBook();
     }
     // xhr.onerror = () => {console.log('connection error')};
     xhr.onerror = () => {alert('error')};
     xhr.open('POST', `${baseurl}/books`);
     xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.setRequestHeader('X-Auth-Token', '12345');
     xhr.send(JSON.stringify(book));
   }
 
@@ -55,7 +56,6 @@ const main = () => {
     // xhr.onerror = () => {console.log('connection error')};
     xhr.open('PUT', `${baseurl}/edit/${book.id}`);
     xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.setRequestHeader('X-Auth-Token', '12345');
     xhr.send(JSON.stringify(book));
   }
 
@@ -69,7 +69,6 @@ const main = () => {
 
     // xhr.onerror = () => {console.log('connection error')};
     xhr.open('DELETE', `${baseurl}/delete/${bookId}`);
-    xhr.setRequestHeader('X-Auth-Token', '12345');
     xhr.send();
   }
    
@@ -189,15 +188,20 @@ const main = () => {
   }
 
   document.addEventListener('DOMContentLoaded', () => {
+    getBook();
     const submitButton = document.getElementById('submit');
     submitButton.addEventListener('click', (event) => {
       // addBook();
-      const generateID = generateId();
-      const title = document.getElementById('title').value;
+      const name = document.getElementById('title').value;
       const author = document.getElementById('author').value;
       const year = document.getElementById('year').value;
       const isCompleted = document.getElementById('isCompleted').checked;
-      const bookObject = generateBookObject(generateID, title, author, year, isCompleted);
+      const bookObject = {
+        name,
+        year,
+        author,
+        isCompleted
+      }
 
       insertBook(bookObject);
       refresh();
@@ -247,7 +251,7 @@ const main = () => {
     renderAction('');
   });
 
-  const renderAction = (value) => {
+  const renderAction = (value = '') => {
     const regex = new RegExp(value,"i");
 
     const uncompletedBookList = document.getElementById('uncompleted-list');
@@ -281,7 +285,7 @@ const main = () => {
     return +new Date();
   }
 
-  const generateBookObject = (id, title, author, year, isCompleted) => {
+  const generateBookObject = (idtitle, author, year, isCompleted) => {
     return {
       id,
       title,
