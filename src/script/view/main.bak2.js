@@ -1,11 +1,19 @@
 import '../component/search-bar.js';
 
-const books = [];
+const books = [
+  {
+      "id": "J3xMUig2ev9CSzMg",
+      "name": "tes",
+      "year": 2020,
+      "author": "haha",
+      "isCompleted": false
+  }
+];
 let editingId = null;
 const RENDER_EVENT = 'render-book';
 const SAVED_EVENT = 'saved-book';
 const STORAGE_KEY = 'BOOKSHELF_APPS';
-const baseurl = 'http://localhost';
+const baseurl = 'http://localhost:5000';
 
 const main = () => {
 
@@ -14,16 +22,17 @@ const main = () => {
 
     xhr.onload = function () {
       const responseJson = JSON.parse(this.responseText);
-
+      
       if(responseJson.error){
-        console.log(responseJson.message);
+        alert('gagal');
       } else {
-        renderAction('');
+        alert(JSON.stringify(responseJson.data.books));
+        renderAction();
       }
     }
 
-    xhr.onerror = () => {console.log('connection error')};
-    xhr.open('GET', `${baseurl}/list`);
+    xhr.onerror = function () { alert('connection error')};
+    xhr.open('GET', `${baseurl}/books`);
     xhr.send();
   }
 
@@ -32,13 +41,14 @@ const main = () => {
 
     xhr.onload = function () {
       const responseJson = JSON.parse(this.responseText);
-      console.log(responseJson.message);
+      // alert(responseJson);
+      // alert('berhasil');
       getBook();
     }
-    xhr.onerror = () => {console.log('connection error')};
-    xhr.open('POST', `${baseurl}/add`);
+    // xhr.onerror = () => {console.log('connection error')};
+    xhr.onerror = () => {alert('error')};
+    xhr.open('POST', `${baseurl}/books`);
     xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.setRequestHeader('X-Auth-Token', '12345');
     xhr.send(JSON.stringify(book));
   }
 
@@ -47,14 +57,13 @@ const main = () => {
 
     xhr.onload = function () {
       const responseJson = JSON.parse(this.responseText);
-      console.log(responseJson.message);
+      // console.log(responseJson.message);
       getBook();
     }
 
-    xhr.onerror = () => {console.log('connection error')};
+    // xhr.onerror = () => {console.log('connection error')};
     xhr.open('PUT', `${baseurl}/edit/${book.id}`);
     xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.setRequestHeader('X-Auth-Token', '12345');
     xhr.send(JSON.stringify(book));
   }
 
@@ -62,13 +71,12 @@ const main = () => {
     const xhr = new XMLHttpRequest();
     xhr.onload = function () {
       const responseJson = JSON.parse(this.responseText);
-      console.log(responseJson.message);
+      // console.log(responseJson.message);
       getBook();
     }
 
-    xhr.onerror = () => {console.log('connection error')};
+    // xhr.onerror = () => {console.log('connection error')};
     xhr.open('DELETE', `${baseurl}/delete/${bookId}`);
-    xhr.setRequestHeader('X-Auth-Token', '12345');
     xhr.send();
   }
    
@@ -188,16 +196,38 @@ const main = () => {
   }
 
   document.addEventListener('DOMContentLoaded', () => {
+    getBook();
     const submitButton = document.getElementById('submit');
     submitButton.addEventListener('click', (event) => {
-      addBook();
+      // addBook();
+      const name = document.getElementById('title').value;
+      const author = document.getElementById('author').value;
+      const year = document.getElementById('year').value;
+      const isCompleted = document.getElementById('isCompleted').checked;
+      const bookObject = {
+        name,
+        year,
+        author,
+        isCompleted
+      }
+
+      insertBook(bookObject);
       refresh();
       event.preventDefault();
     });
 
     const editSubmitButton = document.getElementById('editSubmit');
     editSubmitButton.addEventListener('click', (event) => {
-      editSubmit(editingId);
+      // editSubmit(editingId);
+
+      bookTarget.title = document.getElementById('editTitle').value;
+      bookTarget.author = document.getElementById('editAuthor').value;
+      bookTarget.year = document.getElementById('editYear').value;
+      bookTarget.isCompleted = document.getElementById('editIsCompleted').checked;
+      
+      document.getElementById('add-form').classList.remove('hide');
+      document.getElementById('edit-form').classList.add('hide');
+
       refresh();
       event.preventDefault();
     });
@@ -229,7 +259,7 @@ const main = () => {
     renderAction('');
   });
 
-  const renderAction = (value) => {
+  const renderAction = (value = '') => {
     const regex = new RegExp(value,"i");
 
     const uncompletedBookList = document.getElementById('uncompleted-list');
@@ -263,7 +293,7 @@ const main = () => {
     return +new Date();
   }
 
-  const generateBookObject = (id, title, author, year, isCompleted) => {
+  const generateBookObject = (idtitle, author, year, isCompleted) => {
     return {
       id,
       title,
