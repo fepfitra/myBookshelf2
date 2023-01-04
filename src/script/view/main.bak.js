@@ -151,7 +151,6 @@ const main = () => {
       deleteButton.addEventListener(('click'), () => {
         const index = bookArray.findIndex((book) => book.id === list.id);
         removeBook(bookArray[index].id);
-        remove();
       })
     })
   }
@@ -167,10 +166,6 @@ const main = () => {
     document.getElementById('editAuthor').value = '';
     document.getElementById('editYear').value = '';
     document.getElementById('editIsCompleted').checked = false;
-
-    document.getElementById('edit-form').classList.add('hide');
-    document.getElementById('add-form').classList.remove('hide');
-
   }
 
   document.addEventListener('DOMContentLoaded', () => {
