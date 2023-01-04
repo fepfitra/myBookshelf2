@@ -1,22 +1,23 @@
 class SearchBar extends HTMLElement {
-  constructor(){
+  constructor() {
     super();
-    this.shadowDOM = this.attachShadow({mode: 'open'});
+    this.shadowDOM = this.attachShadow({ mode: 'open' });
   }
-  connectedCallback(){
+
+  connectedCallback() {
     this.render();
   }
 
-  set inputEvent(event){
+  set inputEvent(event) {
     this._clickEvent = event;
     this.render();
   }
 
-  get value(){
+  get value() {
     return this.shadowDOM.querySelector('#find').value;
   }
 
-  render(){
+  render() {
     this.shadowDOM.innerHTML = `
       <style>
         @import url('https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css');
@@ -31,8 +32,8 @@ class SearchBar extends HTMLElement {
       </div>
     `;
 
-    this.shadowDOM.querySelector('#find').addEventListener('input',this._clickEvent);
+    this.shadowDOM.querySelector('#find').addEventListener('input', this._clickEvent);
   }
 }
 
-customElements.define("search-bar", SearchBar);
+customElements.define('search-bar', SearchBar);

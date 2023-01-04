@@ -1,88 +1,96 @@
-import '../component/search-bar.js';
+import '../component/search-bar';
+import Swal from 'sweetalert2';
 
 const baseurl = 'http://localhost:5000';
 
 const main = () => {
-
   const getBook = (regex = '') => {
-    const filter = new RegExp(regex, "i");
-    const xhr = new XMLHttpRequest();
-
-    xhr.onload = function () {
-      const responseJson = JSON.parse(this.responseText);
-
-      if(responseJson.error){
-        alert(responseJson.message);
-      } else {
-        renderAllBooks(responseJson.data.books, filter);
-      }
-    }
-
-    xhr.onerror = () => {
-      alert('error getBook');
-    };
-    xhr.open('GET', `${baseurl}/books`);
-    xhr.send();
-  }
+    const filter = new RegExp(regex, 'i');
+    fetch(`${baseurl}/books`)
+      .then((response) => response.json())
+      .then((responseJson) => {
+        if (responseJson.error) {
+          Swal.fire({
+            icon: 'error',
+            text: responseJson.message,
+          });
+        } else {
+          renderAllBooks(responseJson.data.books, filter);
+        }
+      })
+      .catch((error) => {
+        Swal.fire({
+          icon: 'error',
+          text: error,
+        });
+      });
+  };
 
   const insertBook = (book) => {
-    const xhr = new XMLHttpRequest();
-
-    xhr.onload = function () {
-      getBook();
-    }
-    xhr.onerror = () => {
-      alert('error insertBook');
-    };
-    xhr.open('POST', `${baseurl}/books`);
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.send(JSON.stringify(book));
-  }
+    fetch(`${baseurl}/books`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(book),
+    }).then((response) => response.json())
+      .then((responseJson) => {
+        Swal.fire(responseJson.message);
+        getBook();
+      });
+  };
 
   const updateBook = (book) => {
-    const xhr = new XMLHttpRequest();
-
-    xhr.onload = function () {
-      const responseJson = JSON.parse(this.responseText);
-      console.log(responseJson.message);
-      getBook();
-    }
-
-    xhr.onerror = () => {console.log('connection error')};
-    xhr.open('PUT', `${baseurl}/books/${book.id}`);
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.send(JSON.stringify(book));
-  }
+    fetch(`${baseurl}/books/${book.id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(book),
+    }).then((response) => response.json())
+      .then((responseJson) => {
+        Swal.fire(responseJson.message);
+        getBook();
+      })
+      .catch((error) => {
+        Swal.fire({
+          icon: 'error',
+          text: error,
+        });
+      });
+  };
 
   const removeBook = (bookId) => {
-    const xhr = new XMLHttpRequest();
-    xhr.onload = function () {
-      const responseJson = JSON.parse(this.responseText);
-      console.log(responseJson.message);
-      getBook();
-    }
-
-    xhr.onerror = () => {console.log('connection error')};
-    xhr.open('DELETE', `${baseurl}/books/${bookId}`);
-    xhr.send();
-  }
+    fetch(`${baseurl}/books/${bookId}`, {
+      method: 'DELETE',
+    }).then((response) => response.json())
+      .then((responseJson) => {
+        Swal.fire(responseJson.message);
+        getBook();
+      })
+      .catch((error) => {
+        Swal.fire({
+          icon: 'error',
+          text: error,
+        });
+      });
+  };
 
   const renderAllBooks = (bookArray, filter) => {
-
     const uncompletedBookList = document.getElementById('uncompleted-list');
     uncompletedBookList.innerHTML = '';
 
     const completedBookList = document.getElementById('completed-list');
-    completedBookList.innerHTML='';
+    completedBookList.innerHTML = '';
 
     let completedCount = 0;
 
-    for(const book of bookArray){
+    for (const book of bookArray) {
     // bookArray.forEach((book) => {
-      if(book.name.search(filter) === -1) continue;
+      if (book.name.search(filter) === -1) continue;
 
-      const title = book.isCompleted ? `<del>${book.name}</del>`:book.name;
-      const isCompleted = book.isCompleted ? `checked`:``;
+      const title = book.isCompleted ? `<del>${book.name}</del>` : book.name;
+      const isCompleted = book.isCompleted ? 'checked' : '';
       const bookElement = `
         <li class="list-group-item d-flex justify-content-between align-item-start" id="${book.id}">
           <input type="checkbox" class="form-check-input me-1 mt-3" ${isCompleted}>
@@ -107,31 +115,28 @@ const main = () => {
         </li>
       `;
 
-      if(!book.isCompleted){
+      if (!book.isCompleted) {
         uncompletedBookList.innerHTML += bookElement;
-      }else{
+      } else {
         completedBookList.innerHTML += bookElement;
         completedCount++;
       }
-    };
+    }
 
-    if(completedCount === 0){
+    if (completedCount === 0) {
       document.getElementById('completed-container').classList.add('hide');
-    }else{
+    } else {
       document.getElementById('completed-container').classList.remove('hide');
     }
 
-    const li = document.querySelectorAll("li");
+    const li = document.querySelectorAll('li');
 
     li.forEach((list) => {
-
       const checkBox = list.childNodes[1];
       checkBox.addEventListener('change', () => {
-
         const index = bookArray.findIndex((book) => book.id === list.id);
         bookArray[index].isCompleted = checkBox.checked;
         updateBook(bookArray[index]);
-
       });
 
       const editButton = list.childNodes[5].childNodes[1];
@@ -151,18 +156,18 @@ const main = () => {
       deleteButton.addEventListener(('click'), () => {
         const index = bookArray.findIndex((book) => book.id === list.id);
         removeBook(bookArray[index].id);
-        remove();
-      })
-    })
-  }
+        refresh();
+      });
+    });
+  };
 
   const refresh = () => {
     document.getElementById('editingId').value = '';
     document.getElementById('title').value = '';
-    document.getElementById('author').value ='';
+    document.getElementById('author').value = '';
     document.getElementById('year').value = '';
     document.getElementById('isCompleted').checked = false;
-    
+
     document.getElementById('editTitle').value = '';
     document.getElementById('editAuthor').value = '';
     document.getElementById('editYear').value = '';
@@ -170,53 +175,45 @@ const main = () => {
 
     document.getElementById('edit-form').classList.add('hide');
     document.getElementById('add-form').classList.remove('hide');
-
-  }
+  };
 
   document.addEventListener('DOMContentLoaded', () => {
-
     getBook();
-
 
     const submitButton = document.getElementById('submit');
     submitButton.addEventListener('click', () => {
-
       const name = document.getElementById('title').value;
       const author = document.getElementById('author').value;
       const year = document.getElementById('year').value;
       const isCompleted = document.getElementById('isCompleted').checked;
 
-      insertBook({name, author, year, isCompleted});
+      insertBook({
+        name, author, year, isCompleted,
+      });
       refresh();
-
     });
-
 
     const editSubmitButton = document.getElementById('editSubmit');
     editSubmitButton.addEventListener('click', () => {
-
       const id = document.getElementById('editingId').value;
       const name = document.getElementById('editTitle').value;
       const author = document.getElementById('editAuthor').value;
       const year = document.getElementById('editYear').value;
       const isCompleted = document.getElementById('editIsCompleted').checked;
 
-      updateBook({id, name, author, year, isCompleted});
+      updateBook({
+        id, name, author, year, isCompleted,
+      });
       refresh();
-
     });
-
 
     const cancelButton = document.getElementById('cancel');
     cancelButton.addEventListener('click', () => {
-
       document.getElementById('add-form').classList.remove('hide');
       document.getElementById('edit-form').classList.add('hide');
 
       refresh();
-
     });
-
 
     const findElement = document.querySelector('search-bar');
     findElement.inputEvent = async () => {
@@ -224,10 +221,13 @@ const main = () => {
         const filter = await findElement.value;
         getBook(filter);
       } catch (error) {
-        alert(error);
+        Swal({
+          icon: 'error',
+          text: error,
+        });
       }
-    }
+    };
   });
-}
+};
 
 export default main;

@@ -1,14 +1,14 @@
 class AppBar extends HTMLElement {
-  constructor(){
+  constructor() {
     super();
-    this.shadowDOM = this.attachShadow(({mode: 'open'}));
+    this.shadowDOM = this.attachShadow(({ mode: 'open' }));
   }
 
-  connectedCallback(){
+  connectedCallback() {
     this.render();
   }
 
-  render(){
+  render() {
     this.shadowDOM.innerHTML = `
       <style>
         @import url('https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css');
@@ -24,4 +24,4 @@ class AppBar extends HTMLElement {
   }
 }
 
-customElements.define("app-bar", AppBar);
+customElements.define('app-bar', AppBar);
