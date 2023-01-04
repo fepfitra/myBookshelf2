@@ -65,7 +65,7 @@ const main = () => {
       method: 'DELETE',
     }).then((response) => response.json())
       .then((responseJson) => {
-        Swal.fire(responseJson.message);
+        // Swal.fire(responseJson.message);
         getBook();
       })
       .catch((error) => {
